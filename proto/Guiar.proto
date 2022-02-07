@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message GuiarItem{
+  int32 id = 2;
+  bool state = 3;
+  int32 data_a = 4;
+  int32 data_b = 5;
+}
+
+message GuiarBlock{
+  int32 uid = 1;
+  int32 group_id = 2;
+  repeated GuiarItem  items = 3;
+}

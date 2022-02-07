@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+message Results{
+  int64 id = 1;
+  int32 uid = 2;
+  repeated Result results = 3;
+}
+
+message Result{
+  string title = 1;
+  bool state = 2;
+  int32 data_a = 3;
+  int32 data_b = 4;
+  int32 group_id = 5;
+  int32 id = 6;
+}
+
+message SetConfig{
+  int64 id = 1;
+  string genshin_window_name = 2;
+  string start_hotkey = 3;
+  string stop_hotkey = 4;
+}
+
+message IdMessage{
+  int64 id = 1;
+}
+
+message Response{
+  int64 id = 1;
+  int32 state = 2;
+  string remark = 3;
+}
