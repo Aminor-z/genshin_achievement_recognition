@@ -147,14 +147,14 @@ def export_from_guiar(file_path, gamt_path="gar/gamt.csv", split_by_incomplete=T
     save_file_path = os.path.join(output_file_dir, save_file_name)
     save_file_name_incomplete: str = None
     save_file_path_incomplete: str = None
-    complete_achievement_list = sorted(complete_achievement_list, key=lambda x: (x[0] + 1) * x[1])
+    complete_achievement_list = sorted(complete_achievement_list, key=lambda x: x[0]*1e7+x[1])
     if split_by_incomplete:
         save_file_name_incomplete = save_file_name_prefix + "_incomplete" + "." + output_format
         save_file_path_incomplete = os.path.join(output_file_dir, save_file_name_incomplete)
         for _id, _args in gamt.items():
             if _id not in reached_id:
                 incomplete_achievement_list.append([int(_args[1]), int(_id), _args[0]])
-        incomplete_achievement_list = sorted(incomplete_achievement_list, key=lambda x: (x[0] + 1) * x[1])
+        incomplete_achievement_list = sorted(incomplete_achievement_list, key=lambda x: x[0]*1e7+x[1])
     if output_format == "csv":
         with open(save_file_path, "w", encoding="utf-8-sig", newline="") as fw:
             cfw = csv.writer(fw)
