@@ -269,7 +269,7 @@ class GenshinAchievementRecognition(object):
                 left_slash_anchor_x = left_slash_min_loc[0] + self.template_slash_date.shape[1]
                 img_year = img_date[:, :left_slash_min_loc[0] + 1]
                 img_year = self.transform_rds(img_year)
-                img_year = self.make_clear(img_year, [210, 255], 130)
+                img_year = self.make_clear(img_year, [200, 255], 120)
                 result_year = self.reader.recognize(img_year, decoder=self.ocr_decoder[self.ocr_decoder_index[5]],
                                                     allowlist=self.allow_list_num)
                 year = result_year[0][1]
@@ -286,7 +286,7 @@ class GenshinAchievementRecognition(object):
                 right_slash_anchor_x = self.x_split_data_img_right + right_slash_min_loc[0]
                 img_day = img_date[:, right_slash_anchor_x + self.template_slash_date.shape[1] - 2:]
                 img_day = self.transform_rds(img_day)
-                img_day = self.make_clear(img_day, [210, 255], 130)
+                img_day = self.make_clear(img_day, [200, 255], 120)
                 result_day = self.reader.recognize(img_day, decoder=self.ocr_decoder[self.ocr_decoder_index[6]],
                                                    allowlist=self.allow_list_num)
                 day = result_day[0][1]
@@ -296,7 +296,7 @@ class GenshinAchievementRecognition(object):
                     day = 0
                 img_month = img_date[:, left_slash_anchor_x - 1:right_slash_anchor_x + 1]
                 img_month = self.transform_rds(img_month)
-                img_month = self.make_clear(img_month, [210, 255], 130)
+                img_month = self.make_clear(img_month, [200, 255], 120)
                 result_month = self.reader.recognize(img_month, decoder=self.ocr_decoder[self.ocr_decoder_index[7]],
                                                      allowlist=self.allow_list_num)
                 try:

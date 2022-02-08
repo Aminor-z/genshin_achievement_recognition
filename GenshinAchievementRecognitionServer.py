@@ -1,7 +1,7 @@
 import csv
+import ctypes
 import json
 import logging
-import os
 import time
 from copy import copy
 
@@ -331,7 +331,20 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
             return
 
 
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+
+        return False
+
+
 if __name__ == '__main__':
+    import os
+    if not is_admin():
+        logging.info("Please run in administrator mode.")
+        os.system('pause')
+        exit(0)
     gar = GenshinAchievementRecognitionServer()
     gar.init()
     logging.info("Resources loading finish.")

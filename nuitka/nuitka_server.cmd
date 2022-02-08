@@ -1,1 +1,0 @@
-python -m nuitka  ../GenshinAchievementRecognitionServer.py  --show-memory --show-progress --windows-uac-admin --enable-plugin=numpy,torch,pyqt5 --mingw64 --prefer-source-code --lto=no

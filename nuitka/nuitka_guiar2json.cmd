@@ -1,1 +1,1 @@
-python -m nuitka --standalone --onefile  ../Guiar2Json.py  --show-memory --show-progress --windows-uac-admin --mingw64 --prefer-source-code
+python -m nuitka  ../Guiar2Json.py -o ../guiar2json.exe  --show-memory --show-progress --mingw64 --prefer-source-code
