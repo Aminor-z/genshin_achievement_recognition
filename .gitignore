@@ -125,5 +125,7 @@ gar/gar_config.json
 gar/gar_server_config.json
 *.iml
 /nuitka/*/
+/nuitka/*.exe
 /*.exe
 gar/client_config.json
+temp*.*

@@ -10,7 +10,7 @@ uid = uid.strip()
 input_dir = "gar/record"
 input_path = os.path.join(input_dir, f"{uid}.guiar")
 try:
-    output_path, output_path_incomplete = export_from_guiar(input_path)
+    output_path, output_path_incomplete = export_from_guiar(input_path, output_format="json")
 except Exception as e:
     import traceback
 
