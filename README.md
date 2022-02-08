@@ -1,12 +1,12 @@
 [![genshin_achievement_recognition](https://socialify.git.ci/Aminor-z/genshin_achievement_recognition/image?forks=1&issues=1&language=1&name=1&pulls=1&stargazers=1&theme=Dark)](https://github.com/Aminor-z/genshin_achievement_recognition)
 
 
-# <center>✧*｡ (ˊᗜˋ*) ✧*｡</center>
-<center>你好呀，这是一个通过OCR识别原神成就的项目</center>
-<center>Hi, this is a project to identify Genshin Impact through OCR.</center>
+# ✧*｡ (ˊᗜˋ*) ✧*｡
+你好呀，这是一个通过OCR识别原神成就的项目  
+Hi, this is a project to identify Genshin Impact through OCR.
 &nbsp;
 
-# <center>快速使用</center>
+# 快速使用
 
 1. 环境配置：运行`setup_requeiment.cmd`。
 2. 启动`原神`。
@@ -36,7 +36,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>输出示例</center>
+# 输出示例
 * `{uid}.csv`识别成就一览  
 
 | GroupId | Id   | 成就名称 | 状态 | 当前进度 | 目标进度 | 总计 | 完成日期 |
@@ -60,7 +60,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>配置文件</center>
+# 配置文件
 
 * 位于`gar`文件夹内。
 * 配置文件不存在时生成默认配置文件。
@@ -90,7 +90,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>guiar文件</center>
+# guiar文件
 
 * `guiar`文件使用protobuf进行编码，由`GuiarBlock`和`GuiarItem`组成，其大致格式如下所示：
 
@@ -127,7 +127,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>gamt文件</center>
+# gamt文件
 
 * 该文件为原神成就映射表(Genshin Impact Achievement Mapping Table)
 * 格式：
@@ -135,7 +135,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>title_fix文件</center>
+# title_fix文件
 
 * 该文件为标题修复文件。由于OCR对相似中文字符难以辨别，如`迁`和`迂`、`土`和`士`等，外加原神游戏内字体笔画较粗，造成个别字符识别出错或失败。
 * 格式：
@@ -144,10 +144,10 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 &nbsp;
 
-# <center>API文档</center>
+# API文档
 * API文档会在日后完善  
 
 &nbsp;
 
-# <center>友情链接</center>
+# 友情链接
 * [Snap.Genshin](https://github.com/DGP-Studio/Snap.Genshin)
