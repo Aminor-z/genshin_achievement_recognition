@@ -19,9 +19,9 @@ Readme files will be gradually improved in the future
 
 ```
 Loading Resource[GenshinAchievementRecognition]: 100%|███████████████████████████████████| 1/1 [xx:xx<xx:xx,  x.xxs/it]
-20xx-xx-xx xx:xx:xx INFO: Resources loading finish.
+xxxx-xx-xx xx:xx:xx INFO: Resources loading finish.
 ```
-7. 启动`start_server.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionClient.py`）（必须）
+7. 启动`start_client.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionClient.py`）（必须）
 8. 默认按`q`开始识别，按任意其他键取消。
 9. 识别期间尽量不要进行操作，识别完成时会显示如下内容：
 
