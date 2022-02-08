@@ -56,7 +56,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 | 0       | 128 | 天赐的猎人之手 |          |          |
 | 0       | 129 | 动物园大亨      |          |          |
 
-另有`json`格式输出，见 [json格式输出](doc/json_output.md)
+* 另有`json`格式输出，见 [json格式输出](doc/json_output.md)
 
 &nbsp;
 
