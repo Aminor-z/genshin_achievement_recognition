@@ -26,8 +26,9 @@ Loading Resource[GenshinAchievementRecognition]: 100%|████████�
 9. 识别期间尽量不要进行操作，识别完成时会显示如下内容：
 
 ```
-Loading Resource[GenshinAchievementRecognition]: 100%|███████████████████████████████████| 1/1 [xx:xx<xx:xx,  x.xxs/it]
-20xx-xx-xx xx:xx:xx INFO: Resources loading finish.
+xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1005]: Start to save achievement record.
+xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1006]: Achievement record saved. [path=gar/record/xxxx.guiar]
+xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 ```
 
 10. 您可以切换至其他成就分页重复`7~9`的操作步骤进行识别
