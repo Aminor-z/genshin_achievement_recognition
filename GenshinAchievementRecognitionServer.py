@@ -23,7 +23,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
     def __init__(self, host: str = "127.0.0.1", port: int = 50003):
         self.host: str = host
         self.port: int = port
-        self.config_path: str = "gar/gar_server_config.json"
+        self.config_path: str = "gar/server_config.json"
         self.save_record: bool = True
         self.save_record_path: str = None
         self.save_record_backup: bool = True
@@ -112,7 +112,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
     def start_recognition(self, id_message_bytes, handler: PruinaHandler = None, **kwargs):
         id_message = IdMessage()
         id_message.ParseFromString(id_message_bytes)
-        _id: int = copy(id_message.id)
+        _id: int = copy(int(id_message.id))
         str_recognition_id = f"recognition_{_id}"
         if self.properties.get(str_recognition_id) is not None:
             self.just_send_response(handler, _id, ResponseCode.ExistSameRecognitionId,
@@ -176,13 +176,6 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                                     except:
                                         logging.error("Guiar decode failed.")
                                         break
-                                # while len(gbs) < len(r_gbs):
-                                #     gbs.append(None)
-                                # while len(r_gbs) < len(gbs):
-                                #     r_gbs.append(None)
-                                # for i, gb in enumerate(gbs):
-                                #     if gb is None:
-                                #         gbs[i] = r_gbs[i]
                         while len(gbs) < len(r_gbs):
                             gbs.append(None)
                         while len(r_gbs) < len(gbs):
@@ -220,14 +213,14 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                 handler.send("results", self.generate_results(_id, uid, results))
                 if self.save_record:
                     for r in results:
-                        _, state, data_a, data_b, group_id, _id = r
-                        if _id == -1 or _id in saved_achievement_id_set:
+                        _, state, data_a, data_b, group_id, __id = r
+                        if __id == -1 or __id in saved_achievement_id_set:
                             continue
                         else:
                             while len(ggis) - 1 < group_id:
                                 ggis.append([])
-                            ggis[group_id].append(generate_guiar_item(_id, state, data_a, data_b))
-                            saved_achievement_id_set.add(_id)
+                            ggis[group_id].append(generate_guiar_item(__id, state, data_a, data_b))
+                            saved_achievement_id_set.add(__id)
                 if not self.properties.get(str_recognition_id):
                     self.just_send_response(handler, _id, ResponseCode.TaskCancel, "Task canceled.")
                     logging.info(f"[{_id}]: Task canceled.")

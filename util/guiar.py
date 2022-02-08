@@ -68,7 +68,7 @@ def decode_guiar_block(gb: GuiarBlock):
 
 def encode_date(year, month, day):
     if year <= 0 or month <= 0 or day <= 0:
-        return 0
+        return -(abs(year*100)+abs(month*10)+abs(day))
     else:
         return (year - 2020) * 384 + ((month - 1) << 5) + (day - 1)
 
@@ -138,7 +138,8 @@ def export_from_guiar(file_path, gamt_path="gar/gamt.csv", split_by_incomplete=T
             progress = achievement[3]
             target_progress = achievement[4]
             incomplete_achievement_list.append([group_id, _id, title, progress, target_progress])
-        state = state_remark[0] if state else state_remark[1]
+        if output_format=="csv":
+            state = state_remark[0] if state else state_remark[1]
         complete_achievement_list.append([group_id, _id, title, state, progress, target_progress, amount, date])
     output_file_dir = os.path.join(save_file_dir, output_format)
     if not os.path.exists(output_file_dir):
@@ -147,14 +148,14 @@ def export_from_guiar(file_path, gamt_path="gar/gamt.csv", split_by_incomplete=T
     save_file_path = os.path.join(output_file_dir, save_file_name)
     save_file_name_incomplete: str = None
     save_file_path_incomplete: str = None
-    complete_achievement_list = sorted(complete_achievement_list, key=lambda x: x[0]*1e7+x[1])
+    complete_achievement_list = sorted(complete_achievement_list, key=lambda x: x[0] * 1e7 + x[1])
     if split_by_incomplete:
         save_file_name_incomplete = save_file_name_prefix + "_incomplete" + "." + output_format
         save_file_path_incomplete = os.path.join(output_file_dir, save_file_name_incomplete)
         for _id, _args in gamt.items():
             if _id not in reached_id:
                 incomplete_achievement_list.append([int(_args[1]), int(_id), _args[0]])
-        incomplete_achievement_list = sorted(incomplete_achievement_list, key=lambda x: x[0]*1e7+x[1])
+        incomplete_achievement_list = sorted(incomplete_achievement_list, key=lambda x: x[0] * 1e7 + x[1])
     if output_format == "csv":
         with open(save_file_path, "w", encoding="utf-8-sig", newline="") as fw:
             cfw = csv.writer(fw)

@@ -20,7 +20,7 @@ from util.guiar import encode_date
 
 class GenshinAchievementRecognition(object):
     def __init__(self):
-        self.config_path: str = "gar/gar_config.json"
+        self.config_path: str = "gar/config.json"
         self.window_name: str = None
         self.dmax: int = None
         self.x_split_data_img_left: int = None
@@ -74,7 +74,7 @@ class GenshinAchievementRecognition(object):
     def __load_ndarray_in_config(self):
         self.template_slash_progress = np.array(self.template_slash_progress, dtype=np.uint8)
         self.template_slash_date = np.array(self.template_slash_date, dtype=np.uint8)
-        self.sharpen_kernel = np.array(self.sharpen_kernel, dtype=np.int)
+        self.sharpen_kernel = np.array(self.sharpen_kernel, dtype=np.int32)
         self.template_img_complete = np.array(self.template_img_complete, dtype=np.uint8)
 
     def init(self):
@@ -88,11 +88,11 @@ class GenshinAchievementRecognition(object):
         self.ocr_model_dir = "gar/model"
         self.title_reformat = True
         self.dmax = 560
-        self.x_split_data_img_left = 54
+        self.x_split_data_img_left = 57
         self.x_split_data_img_right = 50
         self.allow_list_amount = ""
         self.allow_list_state = "达成1234567890/"
-        self.ocr_decoder_index: tuple = (2, 1, 1, 1, 1, 1, 1, 1)
+        self.ocr_decoder_index: tuple = (2, 1, 0, 0, 0, 0, 0, 0)
         self.enable_gpu: bool = False
         self.template_slash_progress = [
             [[215, 227, 237], [214, 226, 236], [214, 226, 236], [211, 223, 233], [183, 197, 209], [188, 202, 214]],
@@ -124,7 +124,7 @@ class GenshinAchievementRecognition(object):
         self.item2title_offset = (90, 10, 475, 40)  # l,u,w,h
         self.item2state_offset = (665, 30, 35, 20)  # l,u,w,h
         self.item2progress_offset = (630, 31, 95, 18)  # l,u,w,h
-        self.item2amount_offset = (625, 39, 105, 16)  # l,u,w,h
+        self.item2amount_offset = (625, 38, 105, 18)  # l,u,w,h
         self.item2date_offset = (636, 60, 88, 17)  # l,u,w,h
         self.scroll_config = (1230, 130, 500)
         return {
@@ -181,20 +181,20 @@ class GenshinAchievementRecognition(object):
                                   self.location_offset[0]:self.location_offset[1],
                                   self.location_offset[2]:self.location_offset[3]]
         cnts, _ = cv2.findContours(location_cropped_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        boxs = np.array([np.int0(cv2.boxPoints(cv2.minAreaRect(c))) for c in cnts], dtype=np.int)
+        boxs = np.array([np.int0(cv2.boxPoints(cv2.minAreaRect(c))) for c in cnts], dtype=np.int32)
         boxs = sorted(boxs, key=lambda x: x[:, 1].min())
         record = []
 
         for box in boxs:
             area = cv2.contourArea(box)
-            if area < 1960:
+            if area < 1980:
                 continue
             _dmax = box[:, 1].max()
             if _dmax > self.dmax:
                 continue
-            title, amount, progress, target_progress, year, month, day = "", 0, -1, -1, 0, 0, 0
+            title, amount, progress, target_progress, year, month, day = "", 1, -1, -1, -1, -1, -1
             box = order_points(box)
-            box = box.astype(dtype=np.int)
+            box = box.astype(dtype=np.int32)
             box = self.apply_location_offset(box)
             box = self.apply_location2item_box(box)
             box_title = self.apply_item2title_box(box)
@@ -202,7 +202,7 @@ class GenshinAchievementRecognition(object):
             result_title = self.reader.recognize(img_title, decoder=self.ocr_decoder[self.ocr_decoder_index[0]])
             title = result_title[0][1]
             if self.title_reformat:
-                title = re.sub(r'[^\w]', '', title)
+                title = re.sub(r'[^\w]', '', title).replace("_", "")
             box_amount_text = self.apply_item2amount_box(box)
             img_amount_text = self.transform_crop_by_box(origin_image, box_amount_text)
             img_amount_text = self.transform_rds(img_amount_text)
@@ -221,7 +221,7 @@ class GenshinAchievementRecognition(object):
                 try:
                     amount = int(tt_amount[::-1])
                 except:
-                    amount = -1
+                    amount = 1
                 is_achievement_complete = 1
             else:
                 box_state = self.apply_item2state_box(box)
@@ -269,14 +269,14 @@ class GenshinAchievementRecognition(object):
                 left_slash_anchor_x = left_slash_min_loc[0] + self.template_slash_date.shape[1]
                 img_year = img_date[:, :left_slash_min_loc[0] + 1]
                 img_year = self.transform_rds(img_year)
-                img_year = self.make_clear(img_year, [200, 255], 120)
+                img_year = self.make_clear(img_year, [205, 255], 55)
                 result_year = self.reader.recognize(img_year, decoder=self.ocr_decoder[self.ocr_decoder_index[5]],
                                                     allowlist=self.allow_list_num)
                 year = result_year[0][1]
                 try:
                     year = int(year[-4:])
                 except:
-                    year = 0
+                    year = -1
                 img_date_split_for_slash_right = img_date[:, self.x_split_data_img_right:]
                 result_template_right = cv2.matchTemplate(img_date_split_for_slash_right,
                                                           self.template_slash_date,
@@ -284,7 +284,7 @@ class GenshinAchievementRecognition(object):
                 cv2.normalize(result_template_right, result_template_right, 0, 1, cv2.NORM_MINMAX, -1)
                 _, _, right_slash_min_loc, _ = cv2.minMaxLoc(result_template_right)
                 right_slash_anchor_x = self.x_split_data_img_right + right_slash_min_loc[0]
-                img_day = img_date[:, right_slash_anchor_x + self.template_slash_date.shape[1] - 2:]
+                img_day = img_date[:, right_slash_anchor_x + self.template_slash_date.shape[1] + 1:]
                 img_day = self.transform_rds(img_day)
                 img_day = self.make_clear(img_day, [200, 255], 120)
                 result_day = self.reader.recognize(img_day, decoder=self.ocr_decoder[self.ocr_decoder_index[6]],
@@ -293,16 +293,16 @@ class GenshinAchievementRecognition(object):
                 try:
                     day = int(day)
                 except:
-                    day = 0
-                img_month = img_date[:, left_slash_anchor_x - 1:right_slash_anchor_x + 1]
+                    day = -1
+                img_month = img_date[:, left_slash_anchor_x + 1:right_slash_anchor_x - 1]
                 img_month = self.transform_rds(img_month)
-                img_month = self.make_clear(img_month, [200, 255], 120)
+                img_month = self.make_clear(img_month, [200, 255], 125)
                 result_month = self.reader.recognize(img_month, decoder=self.ocr_decoder[self.ocr_decoder_index[7]],
                                                      allowlist=self.allow_list_num)
                 try:
                     month = int(result_month[0][1])
                 except:
-                    month = 0
+                    month = -1
             if reformat:
                 if is_achievement_complete:
                     record.append((title, is_achievement_complete, encode_date(year, month, day), amount))
@@ -360,7 +360,7 @@ class GenshinAchievementRecognition(object):
 
     def transform_rds(self, x, val=4):
         x = cv2.resize(x, (int(x.shape[1] * val), int(x.shape[0] * val)))
-        x = cv2.fastNlMeansDenoisingColored(x, None, 3, 3, 7, 19)
+        x = cv2.fastNlMeansDenoisingColored(x, None, 3, 3, 7, 21)
         x = self.img_sharpen(x)
         return x
 
@@ -396,9 +396,6 @@ class GenshinAchievementRecognition(object):
 
     def apply_item2state_box(self, box):
         return self.transform_box_luwh(box, self.item2state_offset)
-
-    # def apply_item2amount_text_box(self, box):
-    #     return self.transform_box_luwh(box, item2amount_text_offset)
 
     def apply_item2amount_box(self, box):
         return self.transform_box_luwh(box, self.item2amount_offset)

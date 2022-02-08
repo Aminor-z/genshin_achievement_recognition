@@ -121,8 +121,8 @@ dmypy.json
 /self_resources/
 /self_util/
 /gar/record
-gar/gar_config.json
-gar/gar_server_config.json
+gar/config.json
+gar/server_config.json
 gar/client_config.json
 *.iml
 /nuitka/*/
