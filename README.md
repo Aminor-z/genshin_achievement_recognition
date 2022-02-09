@@ -3,7 +3,7 @@
 
 # ✧*｡ (ˊᗜˋ*) ✧*｡
 你好呀，这是一个通过OCR识别原神成就的项目  
-Hi, this is a project to identify Genshin Impact through OCR.
+Hi, this is a project to recognize Genshin achievements through OCR.
 &nbsp;
 
 # 快速使用
