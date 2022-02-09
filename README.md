@@ -8,20 +8,19 @@ Hi, this is a project to identify Genshin Impact through OCR.
 
 # 快速使用
 1. clone本项目
-2. 环境配置：运行`setup_requeiment.cmd`。
-3. 启动原神。
-4. 将原神的分辨率调整至`1280×720`（必须）。
-5. 切换至成就页面并进入某个成就分类中，例如`天地万象`。
-6. 不要最小化原神窗口（可切至后台）。
-7. 启动`start_server.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionServer.py`）（必须），等待其显示如下内容：
+2. 环境配置：运行`setup_requeiment.cmd`。请注意，如果您安装过`opencv-python`，请运行`setup_requirements-env-opencv.cmd`而不是前者。（`opencv-python`与`opencv-python-headless`冲突）
+3. 启动原神，并将原神的分辨率调整至`1280×720`（必须）。
+4. 切换至成就页面并进入某个成就分类中，例如`天地万象`。
+5. 不要最小化原神窗口（可切至后台）。
+6. 启动`start_server.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionServer.py`）（必须），等待其显示如下内容：
 
 ```
 Loading Resource[GenshinAchievementRecognition]: 100%|███████████████████████████████████| 1/1 [xx:xx<xx:xx,  x.xxs/it]
 xxxx-xx-xx xx:xx:xx INFO: Resources loading finish.
 ```
-8. 启动`start_client.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionClient.py`）。（必须）
-9. 默认按`q`开始识别，按任意其他键取消。
-10. 识别期间尽量不要进行操作，识别完成时会显示如下内容：
+7. 启动`start_client.exe`（该程序强制服务以管理员模式启动`GenshinAchievementRecognitionClient.py`）。（必须）
+8. 默认按`q`开始识别，按任意其他键取消。
+9. 识别期间尽量不要进行操作，识别完成时会显示如下内容：
 
 ```
 xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1005]: Start to save achievement record.
@@ -29,8 +28,8 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1006]: Achievement record saved. [path=gar/rec
 xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 ```
 
-11. 您可以切换至其他成就分页重复`7~9`的操作步骤进行识别。
-12. 格式转化：
+10. 您可以切换至其他成就分页重复`7~9`的操作步骤进行识别。
+11. 格式转化：
 > `csv`：运行`Guiar2Csv.py`，输入游戏uid后可在`gar/record/csv`目录下找到输出结果。（推荐）  
 > `json`：运行`Guiar2Json.py`，输入游戏uid后可在`gar/record/json`目录下找到输出结果。
 
