@@ -78,7 +78,7 @@ class GenshinAchievementRecognition(object):
         self.template_img_complete = np.array(self.template_img_complete, dtype=np.uint8)
 
     def init(self):
-        self.reader = easyocr.Reader(self.ocr_lang, model_storage_directory=self.ocr_model_dir)
+        self.reader = easyocr.Reader(self.ocr_lang, model_storage_directory=self.ocr_model_dir, gpu=self.enable_gpu)
         self.aw = AWindow(name=self.window_name)
         self.chtic = cv2.calcHist([self.template_img_complete], [0], None, [256], [0.0, 255.0])
 
