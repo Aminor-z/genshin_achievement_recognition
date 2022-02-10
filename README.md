@@ -139,14 +139,3 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 * 该文件为标题修复文件。由于OCR对相似中文字符难以辨别，如`迁`和`迂`、`土`和`士`等，外加原神游戏内字体笔画较粗，造成个别字符识别出错或失败。
 * 格式：
 > {去除空白符、标点符号的错误标题},{去除空白符、标点符号的正确标题}
-
-
-&nbsp;
-
-# API文档
-* API文档会在日后完善  
-
-&nbsp;
-
-# 友情链接
-* [Snap.Genshin](https://github.com/DGP-Studio/Snap.Genshin)
