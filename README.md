@@ -13,6 +13,7 @@ Hi, this is a project to recognize Genshin achievements through OCR.
 | -------------- | ------------------ | ------------------ | -------------- |
 | 100%           | 100%               | 100%               | 99%            |
 
+* QQ交流群：573247616
 &nbsp;
 
 # 快速使用
