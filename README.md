@@ -17,7 +17,7 @@ Hi, this is a project to recognize Genshin achievements through OCR.
 
 # 快速使用
 1. clone本项目或下载源码
-2. 环境配置：运行`setup_requeiment.cmd`。请注意，如果您安装过`opencv-python`，请运行`setup_requirements-env-opencv.cmd`而不是前者。（`opencv-python`与`opencv-python-headless`冲突，两者都安装时导致程序闪退可通过卸载其中任一）
+2. 环境配置：运行`setup_requeiment.cmd`。
 3. 启动原神，并将原神的分辨率调整至`1280×720`（必须）。
 4. 切换至成就页面并进入某个成就分类中，例如`天地万象`。
 5. 不要最小化原神窗口（可切至后台）。
