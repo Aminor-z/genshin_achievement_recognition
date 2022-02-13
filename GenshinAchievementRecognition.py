@@ -48,7 +48,6 @@ class GenshinAchievementRecognition(object):
         self.allow_list_state: str = None
         self.ocr_decoder: tuple = ("greedy", "beamsearch", "wordbeamsearch")
         self.ocr_decoder_index: tuple = None
-        self.chtic: np.ndarray = None
         self.load_config()
         self.init()
 
@@ -80,7 +79,6 @@ class GenshinAchievementRecognition(object):
     def init(self):
         self.reader = easyocr.Reader(self.ocr_lang, model_storage_directory=self.ocr_model_dir, gpu=self.enable_gpu)
         self.aw = AWindow(name=self.window_name)
-        self.chtic = cv2.calcHist([self.template_img_complete], [0], None, [256], [0.0, 255.0])
 
     def load_default_config(self):
         self.window_name = "原神"
@@ -186,11 +184,7 @@ class GenshinAchievementRecognition(object):
         record = []
 
         for box in boxs:
-            area = cv2.contourArea(box)
-            if area < 1980:
-                continue
-            _dmax = box[:, 1].max()
-            if _dmax > self.dmax:
+            if cv2.contourArea(box) < 1980 or box[:, 1].max() > self.dmax:
                 continue
             title, amount, progress, target_progress, year, month, day = "", 1, -1, -1, -1, -1, -1
             box = order_points(box)
@@ -208,10 +202,10 @@ class GenshinAchievementRecognition(object):
             img_amount_text = self.transform_rds(img_amount_text)
             result_amount_text = self.reader.recognize(img_amount_text,
                                                        decoder=self.ocr_decoder[self.ocr_decoder_index[1]],
-                                                       allowlist=self.allow_list_amount)
+                                                       allowlist=self.allow_list_amount, detail=0)
             is_achievement_complete = 0
-            if "总" in result_amount_text[0][1] or "计" in result_amount_text[0][1]:
-                t_amount: str = copy(result_amount_text[0][1])[::-1]
+            if "总" in result_amount_text[0] or "计" in result_amount_text[0]:
+                t_amount: str = copy(result_amount_text[0])[::-1]
                 tt_amount = ""
                 for ta in t_amount:
                     if ta.isdigit():
@@ -228,8 +222,8 @@ class GenshinAchievementRecognition(object):
                 img_state = self.transform_crop_by_box(origin_image, box_state)
                 img_state = self.make_clear(img_state, [200, 255], 200)
                 result_state = self.reader.recognize(img_state, decoder=self.ocr_decoder[self.ocr_decoder_index[2]],
-                                                     allowlist=self.allow_list_state)
-                if "达" in result_state[0][1] or "成" in result_state[0][1]:
+                                                     allowlist=self.allow_list_state, detail=0)
+                if "达" in result_state[0] or "成" in result_state[0]:
                     is_achievement_complete = 1
                 else:
                     box_progress = self.apply_item2progress_box(box)
@@ -242,18 +236,18 @@ class GenshinAchievementRecognition(object):
                     img_target_progress = self.make_clear(img_target_progress, [190, 255], 100)
                     result_target_progress = self.reader.recognize(img_target_progress,
                                                                    decoder=self.ocr_decoder[self.ocr_decoder_index[3]],
-                                                                   allowlist=self.allow_list_num)
+                                                                   allowlist=self.allow_list_num, detail=0)
                     try:
-                        target_progress = int(result_target_progress[0][1])
+                        target_progress = int(result_target_progress[0])
                     except:
                         target_progress = -1
                     img_progress = img_progress[:, :min_loc[0] + 1]
                     img_progress = self.make_clear(img_progress, [190, 255], 100)
                     result_progress = self.reader.recognize(img_progress,
                                                             decoder=self.ocr_decoder[self.ocr_decoder_index[4]],
-                                                            allowlist=self.allow_list_num)
+                                                            allowlist=self.allow_list_num, detail=0)
                     try:
-                        progress = int(result_progress[0][1])
+                        progress = int(result_progress[0])
                     except:
                         progress = -1
             if is_achievement_complete:
@@ -271,8 +265,8 @@ class GenshinAchievementRecognition(object):
                 img_year = self.transform_rds(img_year)
                 img_year = self.make_clear(img_year, [205, 255], 55)
                 result_year = self.reader.recognize(img_year, decoder=self.ocr_decoder[self.ocr_decoder_index[5]],
-                                                    allowlist=self.allow_list_num)
-                year = result_year[0][1]
+                                                    allowlist=self.allow_list_num, detail=0)
+                year = result_year[0]
                 try:
                     year = int(year[-4:])
                 except:
@@ -288,8 +282,8 @@ class GenshinAchievementRecognition(object):
                 img_day = self.transform_rds(img_day)
                 img_day = self.make_clear(img_day, [200, 255], 120)
                 result_day = self.reader.recognize(img_day, decoder=self.ocr_decoder[self.ocr_decoder_index[6]],
-                                                   allowlist=self.allow_list_num)
-                day = result_day[0][1]
+                                                   allowlist=self.allow_list_num, detail=0)
+                day = result_day[0]
                 try:
                     day = int(day)
                 except:
@@ -298,9 +292,9 @@ class GenshinAchievementRecognition(object):
                 img_month = self.transform_rds(img_month)
                 img_month = self.make_clear(img_month, [200, 255], 125)
                 result_month = self.reader.recognize(img_month, decoder=self.ocr_decoder[self.ocr_decoder_index[7]],
-                                                     allowlist=self.allow_list_num)
+                                                     allowlist=self.allow_list_num, detail=0)
                 try:
-                    month = int(result_month[0][1])
+                    month = int(result_month[0])
                 except:
                     month = -1
             if reformat:
@@ -350,9 +344,10 @@ class GenshinAchievementRecognition(object):
             from exception.exception import WhereIsYourGameException
             raise WhereIsYourGameException(self.window_name)
         x, y, _, _ = self.aw.get_window_rect()
-        pyautogui.mouseDown(x + self.scroll_config[0], y + self.scroll_config[1] + self.scroll_config[2])
+        _x, _y = x + self.scroll_config[0], y + self.scroll_config[1]
+        pyautogui.mouseDown(_x, _y + self.scroll_config[2])
         time.sleep(0.1)
-        pyautogui.moveTo(x + self.scroll_config[0], y + self.scroll_config[1], duration=0.5)
+        pyautogui.moveTo(_x, _y, duration=0.4)
         # time.sleep(0.1)
         pyautogui.mouseUp()
         pyautogui.mouseDown()

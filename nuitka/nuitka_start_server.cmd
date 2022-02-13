@@ -1,1 +1,1 @@
-python -m nuitka ../start_server.py -o ../start_server.exe --show-memory --show-progress --mingw64 --prefer-source-code --lto=yes --windows-uac-admin
+python -m nuitka ../GenshinAchievementRecognitionServer.py -o ../start_server.exe --show-memory --show-progress --mingw64 --prefer-source-code --lto=yes --windows-uac-admin

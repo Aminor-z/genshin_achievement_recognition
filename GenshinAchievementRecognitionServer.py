@@ -1,10 +1,10 @@
 import csv
 import ctypes
+import gc
 import json
 import logging
 import time
 from copy import copy
-
 from pruina.socket.handler.PruinaHandler import PruinaHandler
 from pruina.socket.server import PruinaSocketServer
 from pyautogui import FailSafeException
@@ -247,6 +247,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
             self.just_send_response(handler, _id, ResponseCode.UnknownError, "Unknown Error")
             handler.request.close()
         finally:
+            gc.collect()
             self.properties.remove(str_recognition_id)
 
     def cancel_recognition(self, id_message_bytes, handler: PruinaHandler = None, **kwargs):
@@ -328,14 +329,13 @@ def is_admin():
     try:
         return ctypes.windll.shell32.IsUserAnAdmin()
     except:
-
         return False
 
 
 if __name__ == '__main__':
     import os
     if not is_admin():
-        logging.info("Please run in administrator mode.")
+        logging.error("Please run in administrator mode.")
         os.system('pause')
         exit(0)
     gar = GenshinAchievementRecognitionServer()
