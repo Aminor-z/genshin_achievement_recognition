@@ -15,6 +15,8 @@ Hi, this is a project to recognize Genshin achievements through OCR.
 
 * QQ交流群：`573247616`
 * 当前原神匹配版本为`2.5`。（若原神高于这一版本，部分成就可能无法识别，有余力的大佬可通过发Issue等方式催更）
+* 好用不妨点个★`Star` {>~<}  
+
 &nbsp;
 
 # 快速使用
