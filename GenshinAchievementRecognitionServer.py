@@ -5,6 +5,7 @@ import json
 import logging
 import time
 from copy import copy
+
 from pruina.socket.handler.PruinaHandler import PruinaHandler
 from pruina.socket.server import PruinaSocketServer
 from pyautogui import FailSafeException
@@ -206,9 +207,9 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                             gamt_results.append(t)
                         except:
                             gamt_results.append((*r, -1, -1))
-                            logging.error(f"No title named {r[0]} in gmat.")
+                            logging.error(f"No title named {r[0]} in gamt.")
                             self.just_send_response(handler, _id, ResponseCode.GamtMappingFailed,
-                                                    f"No title named {r[0]} in gmat.")
+                                                    f"No title named {r[0]} in gamt.")
                     results = gamt_results
                 handler.send("results", self.generate_results(_id, uid, results))
                 if self.save_record:
@@ -244,7 +245,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
         except Exception as e:
             import traceback
             logging.error(traceback.format_exc())
-            self.just_send_response(handler, _id, ResponseCode.UnknownError, "Unknown Error")
+            self.just_send_response(handler, _id, ResponseCode.UnknownError, "Unknown Error.")
             handler.request.close()
         finally:
             gc.collect()
@@ -334,10 +335,19 @@ def is_admin():
 
 if __name__ == '__main__':
     import os
-    if not is_admin():
-        logging.error("Please run in administrator mode.")
-        os.system('pause')
-        exit(0)
+    import platform
+
+    if platform.system() == "Windows":
+        if platform.release() == "10":
+            if not is_admin():
+                logging.error("请在管理员模式下启动。")
+                logging.error("Please run in administrator mode.")
+                os.system('pause')
+                exit(0)
+        else:
+            logging.error("在windows11下不能判断是否在管理员模式下启动，请自行确认是否在管理员模式下启动。")
+            logging.error(
+                "In Windows 11, it is not possible to determine whether to start in administrator mode, please confirm whether to start in administrator mode.")
     gar = GenshinAchievementRecognitionServer()
     gar.init()
     logging.info("Resources loading finish.")

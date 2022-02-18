@@ -17,6 +17,6 @@ class ConfigFileErrorException(Exception):
         return f"The config file is corrupted."
 
 
-class GmatFileErrorException(Exception):
+class GamtFileErrorException(Exception):
     def __str__(self):
-        return f"The gmat file maybe incorrect."
+        return f"The gamt file maybe incorrect."

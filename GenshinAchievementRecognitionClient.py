@@ -71,6 +71,9 @@ class GenshinAchievementRecognitionClient(PruinaSocketClient):
             self.connect()
         except:
             logging.info(f"Cannot connect to server[{self.host}:{self.port}].")
+            import os
+            os.system("pause")
+            exit(0)
         self.start_key = KeyCode.from_char(self.start_key.lower())
         self.my_id = id(self)
         self.my_id_message = IdMessage()
