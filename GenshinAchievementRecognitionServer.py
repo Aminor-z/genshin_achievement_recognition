@@ -35,6 +35,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
         self.enable_title_fix: bool = True
         self.title_fix_file_path: str = None
         self.title_fix_dict: dict = None
+        self.fix_group_id: bool = True
         self.load_config()
         super(GenshinAchievementRecognitionServer, self).__init__(host=host, port=port)
         self.__server_init()
@@ -77,6 +78,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
             "save_record_path": self.save_record_path,
             "save_record_backup": self.save_record_backup,
             "save_record_backup_path": self.save_record_backup_path,
+            "fix_group_id": self.fix_group_id,
             "record_type": "guiar",
         }
 
@@ -93,7 +95,10 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
         with open(self.gamt_file_path, "r", encoding='utf-8-sig') as f:
             cf = csv.reader(f)
             for item in cf:
-                self.gamt_map_dict[item[0]] = item[1], int(item[2]), int(item[3])
+                if self.gamt_map_dict.get(item[0]) is None:
+                    self.gamt_map_dict[item[0]] = [(item[1], int(item[2]), int(item[3]))]
+                else:
+                    self.gamt_map_dict[item[0]].append((item[1], int(item[2]), int(item[3])))
 
     def load_title_fix_file(self):
         with open(self.title_fix_file_path, "r", encoding='utf-8-sig') as f:
@@ -137,14 +142,13 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
             last_title = ""
             saved_achievement_id_set = set()
             ggis = []
+            __is_finish = False
             while True:
                 if not self.properties.get(str_recognition_id):
                     self.just_send_response(handler, _id, ResponseCode.TaskCancel, "Task canceled.")
                     logging.info(f"[{_id}]: Task canceled.")
                     break
-                results = gar.recognize()
-                last_results_title = copy(results[-1][0])
-                if last_results_title == last_title:
+                if __is_finish:
                     if self.save_record:
                         self.just_send_response(handler, _id, ResponseCode.SaveFileStart,
                                                 f"Start to save achievement record.")
@@ -153,8 +157,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                             os.makedirs(self.save_record_path)
                         file_name = f"{uid}.guiar"
                         file_path = os.path.join(self.save_record_path, file_name)
-                        gbs = [generate_guiar_block(__gis, uid, i) for i, __gis in enumerate(ggis)]
-                        r_gbs = []
+                        r_ggis = []
                         if os.path.exists(file_path):
                             with open(file_path, "rb") as f:
                                 r_bin_gbs = f.read()
@@ -170,67 +173,101 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                                     try:
                                         l, __gb = decode_binary_guiar_block(r_bin_gbs)
                                         r_bin_gbs = r_bin_gbs[l:]
-                                        while len(r_gbs) - 1 < __gb.group_id:
-                                            r_gbs.append(None)
+                                        while len(r_ggis) - 1 < __gb.group_id:
+                                            r_ggis.append([])
                                         if uid == __gb.uid:
-                                            r_gbs[__gb.group_id] = __gb
+                                            r_ggis[__gb.group_id] = __gb.items
                                     except:
                                         logging.error("Guiar decode failed.")
                                         break
-                        while len(gbs) < len(r_gbs):
-                            gbs.append(None)
-                        while len(r_gbs) < len(gbs):
-                            r_gbs.append(None)
+                        while len(ggis) < len(r_ggis):
+                            ggis.append([])
+                        while len(r_ggis) < len(ggis):
+                            r_ggis.append([])
                         with open(file_path, "wb") as f:
-                            for i, r_gb in enumerate(r_gbs):
+                            for i, r_gis in enumerate(r_ggis):
                                 __bin = b""
-                                if r_gb is None and gbs[i] is None:
+                                if len(r_gis) == 0 and len(ggis[i]) == 0:
                                     continue
-                                elif gbs[i] is None:
-                                    __bin = encode_guiar_block(r_gb)
+                                elif len(ggis[i]) == 0:
+                                    __bin = encode_guiar_block(generate_guiar_block(r_gis, uid, i))
+                                elif len(r_gis) == 0:
+                                    __bin = encode_guiar_block(generate_guiar_block(ggis[i], uid, i))
                                 else:
-                                    __bin = encode_guiar_block(gbs[i])
-
+                                    new_gis = dict()
+                                    for t in r_gis:
+                                        new_gis[t.id] = t
+                                    for t in ggis[i]:
+                                        new_gis[t.id] = t
+                                    new_gis = new_gis.values()
+                                    new_gis = sorted(new_gis, key=lambda x: x.id)
+                                    __bin = encode_guiar_block(generate_guiar_block(new_gis, uid, i))
                                 f.write(__bin)
-
                         self.just_send_response(handler, _id, ResponseCode.SaveFileFinish,
                                                 f"Achievement record saved. [path={file_path}]")
                         logging.info(f"[{_id}]: Saved [file_name={file_name}].")
-                        self.just_send_response(handler, _id, ResponseCode.TaskFinish, "Task finish.")
-                        logging.info(f"[{_id}]: Task finish.")
+                    self.just_send_response(handler, _id, ResponseCode.TaskFinish, "Task finish.")
+                    logging.info(f"[{_id}]: Task finish.")
                     break
-                if self.enable_gamt:
-                    gamt_results = []
-                    for r in results:
-                        try:
-                            t = self.gamt_map(copy(r))
-                            gamt_results.append(t)
-                        except:
-                            gamt_results.append((*r, -1, -1))
-                            logging.error(f"No title named {r[0]} in gamt.")
-                            self.just_send_response(handler, _id, ResponseCode.GamtMappingFailed,
-                                                    f"No title named {r[0]} in gamt.")
-                    results = gamt_results
-                handler.send("results", self.generate_results(_id, uid, results))
-                if self.save_record:
-                    for r in results:
-                        _, state, data_a, data_b, group_id, __id = r
-                        if __id == -1 or __id in saved_achievement_id_set:
-                            continue
-                        else:
-                            while len(ggis) - 1 < group_id:
-                                ggis.append([])
-                            ggis[group_id].append(generate_guiar_item(__id, state, data_a, data_b))
-                            saved_achievement_id_set.add(__id)
-                if not self.properties.get(str_recognition_id):
-                    self.just_send_response(handler, _id, ResponseCode.TaskCancel, "Task canceled.")
-                    logging.info(f"[{_id}]: Task canceled.")
-                    break
-                last_title = last_results_title
-                gar.scroll_down()
+                else:
+                    results = gar.recognize()
+                    try:
+                        last_results_title = copy(results[-1][0])
+                        if last_results_title == last_title:
+                            __is_finish = True
+                        if len(results) <= 4:
+                            __is_finish = True
+                    except:
+                        __is_finish = True
+                    last_title = last_results_title
+                    if self.enable_gamt:
+                        gamt_results = []
+                        for r in results:
+                            try:
+                                t = self.gamt_map(copy(r))
+                                for tt in t:
+                                    gamt_results.append(tt)
+                            except:
+                                gamt_results.append((*r, -1, -1))
+                                logging.error(f"No title named {r[0]} in gamt.")
+                                self.just_send_response(handler, _id, ResponseCode.GamtMappingFailed,
+                                                        f"No title named {r[0]} in gamt.")
+                        results = gamt_results
+                    if self.fix_group_id:
+                        t = dict()
+                        for r in results:
+                            if t.get(r[-2]) is None:
+                                t[r[-2]] = 1
+                            else:
+                                t[r[-2]] += 1
+                        fix_gi = max(t, key=t.get)
+                        t_results = []
+                        for i, r in enumerate(results):
+                            if r[-2] == fix_gi:
+                                t_results.append((*r[:-2], fix_gi, r[-1]))
+                        results = t_results
+                    handler.send("results", self.generate_results(_id, uid, results))
+                    if self.save_record:
+                        for r in results:
+                            _, state, data_a, data_b, group_id, __id = r
+                            if __id == -1 or __id in saved_achievement_id_set:
+                                continue
+                            else:
+                                while len(ggis) - 1 < group_id:
+                                    ggis.append([])
+                                ggis[group_id].append(generate_guiar_item(__id, state, data_a, data_b))
+                                saved_achievement_id_set.add(__id)
+                    if __is_finish:
+                        continue
+                    if not self.properties.get(str_recognition_id):
+                        self.just_send_response(handler, _id, ResponseCode.TaskCancel, "Task canceled.")
+                        logging.info(f"[{_id}]: Task canceled.")
+                        break
+                    gar.scroll_down()
         except IndexError as e:
             self.just_send_response(handler, _id, ResponseCode.NotInAchievementPage,
                                     "Maybe it's not the isolated achievement page in your game.")
+
         except FailSafeException as e:
             self.just_send_response(handler, _id, ResponseCode.MoveMouseWhenWorking,
                                     "I think your genshin window was minimized when I am working.")
@@ -244,6 +281,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
             pass
         except Exception as e:
             import traceback
+
             logging.error(traceback.format_exc())
             self.just_send_response(handler, _id, ResponseCode.UnknownError, "Unknown Error.")
             handler.request.close()
@@ -290,6 +328,7 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
     def gamt_map(self, r):
         title, *data = r
         t = self.gamt_map_dict.get(title)
+        result = []
         if t is None:
             if self.enable_title_fix:
                 tt = self.title_fix_dict.get(title)
@@ -301,12 +340,16 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
                     if t is None:
                         raise KeyError()
                     else:
-                        title, group_id, _id = t
-                        return title, *data, group_id, _id
-            return title, *data, -1, -1
+                        for _t in t:
+                            title, group_id, _id = _t
+                            result.append((title, *data, group_id, _id))
+            else:
+                result.append((title, *data, -1, -1))
         else:
-            title, group_id, _id = t
-            return title, *data, group_id, _id
+            for _t in t:
+                title, group_id, _id = _t
+                result.append((title, *data, group_id, _id))
+        return result
 
     def just_send_response(self, _handler, _id, _code, _remark):
         try:

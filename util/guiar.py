@@ -68,7 +68,7 @@ def decode_guiar_block(gb: GuiarBlock):
 
 def encode_date(year, month, day):
     if year <= 0 or month <= 0 or day <= 0:
-        return -(abs(year*100)+abs(month*10)+abs(day))
+        return -(abs(year * 100) + abs(month * 10) + abs(day))
     else:
         return (year - 2020) * 384 + ((month - 1) << 5) + (day - 1)
 
@@ -138,7 +138,7 @@ def export_from_guiar(file_path, gamt_path="gar/gamt.csv", split_by_incomplete=T
             progress = achievement[3]
             target_progress = achievement[4]
             incomplete_achievement_list.append([group_id, _id, title, progress, target_progress])
-        if output_format=="csv":
+        if output_format == "csv":
             state = state_remark[0] if state else state_remark[1]
         complete_achievement_list.append([group_id, _id, title, state, progress, target_progress, amount, date])
     output_file_dir = os.path.join(save_file_dir, output_format)
