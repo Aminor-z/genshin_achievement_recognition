@@ -72,6 +72,7 @@ xxxx-xx-xx xx:xx:xx INFO: [xxxx]:[1004]: Task finish.
 
 # 目录
 
+* [常见错误解决方案](doc/CES.md)
 * [管理员权限说明](doc/admin.md)
 * [exe文件说明](doc/exe.md)
 * [配置文件说明](doc/config.md)
