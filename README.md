@@ -2,8 +2,7 @@
 
 
 # ✧*｡ (ˊᗜˋ*) ✧*｡
-你好呀，这是一个通过OCR识别原神成就的项目  
-Hi, this is a project to recognize Genshin achievements through OCR.
+这是一个通过OCR识别原神成就的项目。
 
 * 可识别成就名称，成就类型，完成状态，完成次数，完成日期。  
 * 支持导出`csv`、`json`格式
