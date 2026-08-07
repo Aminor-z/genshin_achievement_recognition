@@ -6,6 +6,9 @@ interchange format.
 import os
 from collections import Iterable
 
+# Blacklist for invalid/abandoned achievements
+_INVALID_ACHIEVEMENT_TITLES = frozenset(['善事有善报', '未曾设想的味道', '天降正义', '「我有金钟罩♬」', '(test)测试进入MainCoop保存点(或)'])
+
 from util.proto.Guiar_pb2 import *
 
 export_file_header = ["GroupId", "Id", "成就名称", "状态", "当前进度", "目标进度", "总计", "完成日期"]
@@ -114,6 +117,8 @@ def export_from_guiar(file_path, gamt_path="gar/gamt.csv", split_by_incomplete=T
     with open(gamt_path, "r", encoding="utf-8-sig") as fr:
         cfr = csv.reader(fr)
         for item in cfr:
+            if item[1] in _INVALID_ACHIEVEMENT_TITLES:
+                continue
             gamt[int(item[3])] = item[1:3]
     for i, t in enumerate(achievement_list):
         achievement_list[i].append(gamt[t[1]][0])
