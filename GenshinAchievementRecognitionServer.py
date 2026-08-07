@@ -19,6 +19,9 @@ from util.proto.GenshinAchievementRecognition_pb2 import IdMessage, Response, Re
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s: %(message)s')
 
+# Blacklist for invalid/abandoned achievements
+_INVALID_ACHIEVEMENT_TITLES = frozenset(['善事有善报', '未曾设想的味道', '天降正义', '「我有金钟罩♬」', '(test)测试进入MainCoop保存点(或)'])
+
 
 class GenshinAchievementRecognitionServer(PruinaSocketServer):
     def __init__(self, host: str = "127.0.0.1", port: int = 50003):
@@ -95,6 +98,8 @@ class GenshinAchievementRecognitionServer(PruinaSocketServer):
         with open(self.gamt_file_path, "r", encoding='utf-8-sig') as f:
             cf = csv.reader(f)
             for item in cf:
+                if item[1] in _INVALID_ACHIEVEMENT_TITLES:
+                    continue
                 if self.gamt_map_dict.get(item[0]) is None:
                     self.gamt_map_dict[item[0]] = [(item[1], int(item[2]), int(item[3]))]
                 else:
